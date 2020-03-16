@@ -1,0 +1,21 @@
+{
+  "name": "tvsync",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/screenRecorder"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "colorthief": "^2.3.0",
+    "dotenv": "^8.2.0",
+    "node-dtls-client": "^0.6.0",
+    "screenshot-desktop": "^1.12.0",
+    "sharp": "^0.25.1"
+  }
+}
