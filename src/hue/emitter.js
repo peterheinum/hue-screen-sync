@@ -3,7 +3,6 @@ const dtls = require('node-dtls-client').dtls
 const axios = require('axios')
 const { baseHueUrl, flat } = require('../utils/helpers')
 const { eventHub } = require('../utils/eventHub')
-const convertRgbToBytes = require('../utils/convertRgbToBytes')
 const state = require('../utils/globalState')
 
 const hueUserName = process.env.HUE_CLIENT_KEY
@@ -30,7 +29,7 @@ const startStream = async payload => {
   }
 }
 
-const unsafeStartStream = ({ id, lights }) => {
+const unsafeStartStream = ({ id }) => {
   axios.put(`${baseGroupUrl}/${id}`, { stream: { active: true } })
     .then(() => {
       const options = {

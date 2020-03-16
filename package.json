@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/screenRecorder"
+    "start": "node src/screen/screenRecorder"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +14,9 @@
     "axios": "^0.19.2",
     "colorthief": "^2.3.0",
     "dotenv": "^8.2.0",
+    "lodash": "^4.17.15",
     "node-dtls-client": "^0.6.0",
+    "quantize": "^1.0.2",
     "screenshot-desktop": "^1.12.0",
     "sharp": "^0.25.1"
   }

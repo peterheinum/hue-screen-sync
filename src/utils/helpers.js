@@ -1,3 +1,4 @@
+require('dotenv').config({ path: __dirname + '../../.env' })
 const sleep = async time => new Promise(resolve => setTimeout(() => resolve(), time))
 const flat = arr => arr.reduce((acc, cur) => [...acc, ...cur],[])
 const rand = max => Math.floor(Math.random() * max)

@@ -1,53 +1,71 @@
 const screenshot = require('screenshot-desktop')
 const ColorThief = require('colorthief')
 const sharp = require('sharp')
+const { eventHub } = require('../utils/eventHub')
 
-const state = {
+const screenshotPath = 'screen.jpg'
+let polling = false
+
+const screen = {
   height: 0,
   width: 0,
 }
 
-const setupState = state => {
+const setupState = () => {
   screenshot.listDisplays().then(([display]) => {
     const { height, width } = display
-    Object.assign(state, { height, width })
+    Object.assign(screen, { height, width })
     return Promise.resolve()
   })
 }
 
 const extractCorners = async () => {
   const top = 0
-  await sharp('./screen.jpg')
-    .extract({ left: 0, top, ...state, width: 300 })
-    .toFile('left.jpg')
+  const leftPath = 'left.jpg'
+  const rightPath = 'right.jpg'
+  const topPath = 'top.jpg'
+  const bottomPath = 'bottom.jpg'
 
-  await sharp('./screen.jpg')
-    .extract({ left: state.width - 300, top, ...state, width: 300 })
-    .toFile('right.jpg')
+  await sharp(screenshotPath)
+    .extract({ left: 0, top, ...screen, width: 50 })
+    .toFile(leftPath)
 
-  return Promise.resolve()
+  await sharp(screenshotPath)
+    .extract({ left: screen.width - 50, top, ...screen, width: 50 })
+    .toFile(rightPath)
+
+  await sharp(screenshotPath)
+    .extract({ left: 0, top, ...screen, height: 50 })
+    .toFile(topPath)
+
+  await sharp(screenshotPath)
+    .extract({ left: 0, top: screen.height - 50, ...screen, height: 50 })
+    .toFile(bottomPath)
+
+  return Promise.resolve([leftPath, rightPath, topPath, bottomPath])
 }
 
-const getColors = async () => {
-  const left = []
-  const right = []
+const getAvarageColor = async imgPath => new Promise((resolve, reject) => ColorThief
+  .getColor(imgPath)
+  .then(res => resolve(res))
+  .catch(err => reject(err)))
 
-  await ColorThief.getPalette('./left.jpg', 2)
-    .then(colors => left.push(...colors))
-
-  await ColorThief.getPalette('./right.jpg', 2)
-    .then(colors => right.push(...colors))
-
-  return Promise.resolve({ left, right })
+const extractColors = async () => {
+  await setupState()
+  await screenshot({ filename: screenshotPath })
+  const [leftPath, rightPath, topPath, bottomPath] = await extractCorners()
+  const left = await getAvarageColor(leftPath)
+  const right = await getAvarageColor(rightPath)
+  const top = await getAvarageColor(topPath)
+  const bottom = await getAvarageColor(bottomPath)
+  eventHub.emit('colorsExtracted', { left, right, top, bottom })
+  polling && extractColors()
 }
 
-
-const init = async () => {
-  await setupState(state)
-  await screenshot({ filename: 'screen.jpg' })
-  await extractCorners()
-  await getColors()
-  
+const startPoll = () => {
+  polling = true
+  extractColors()
 }
+const stopPoll = () => polling = !polling
 
-init()
+module.exports = { startPoll, stopPoll }
