@@ -1,21 +1,14 @@
 require('dotenv').config({ path: __dirname + '../../.env' })
-const axios = require('axios')
-const { get, assign, flatten } = require('lodash')
+const { assign } = require('lodash')
 const rl = require('readline')
 const readline = rl.createInterface({ input: process.stdin, output: process.stdout })
 
 /* utils */
 const { eventHub } = require('./utils/eventHub')
 const convertRgbToBytes = require('./utils/convertRgbToBytes')
-const { baseHueUrl, getEntertainmentGroups } = require('./utils/helpers')
+const { getEntertainmentGroups } = require('./utils/helpers')
 const { startPoll, stopPoll } = require('./screen/screenRecorder.js')
 const { getGroupsAndStopStreams, startStream } = require('./hue/socket')
-
-const hueUserName = process.env.HUE_CLIENT_KEY
-const hueClientKey = Buffer.from(process.env.HUE_CLIENT_SECRET, 'hex')
-const baseGroupUrl = `${baseHueUrl(hueUserName)}/groups`
-
-const stopStream = async id => axios.put(`${baseGroupUrl}/${id}`, { stream: { active: false } })
 
 const state = {
   id: null,
@@ -58,7 +51,7 @@ const createSocketMessage = screen => {
   /* TODO Add brightness depending on the subjective brightness of a rgb */
   const brightness = 0x00
   const values = lights.map(({ location }) => convertRgbToBytes(...screen[location])).reduce((acc, cur, index) => ({ ...acc, [index]: cur }), {})
-  const colorMessage = lights.map(({ id }, index) => [0x00, 0x00, parseInt(id), ...flatten(values[index]), brightness, brightness])
+  const colorMessage = lights.map(({ id }, index) => [0x00, 0x00, parseInt(id), ...values[index][0], ...values[index][1], brightness, brightness])
   return colorMessage
 }
 

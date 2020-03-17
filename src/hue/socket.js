@@ -52,7 +52,6 @@ const unsafeStartStream = ({ id }) => {
         .on('connected', e => {
           console.log('connected')
           eventHub.on('emitLight', colorMessage => {
-            console.log(colorMessage)
             const message = Buffer.concat([
               Buffer.from("HueStream", "ascii"),
               Buffer.from([
