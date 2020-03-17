@@ -55,6 +55,7 @@ const giveLightsLocations = () => {
 
 const createSocketMessage = screen => {
   const { lights } = state
+  /* TODO Add brightness depending on the subjective brightness of a rgb */
   const brightness = 0x00
   const values = lights.map(({ location }) => convertRgbToBytes(...screen[location])).reduce((acc, cur, index) => ({ ...acc, [index]: cur }), {})
   const colorMessage = lights.map(({ id }, index) => [0x00, 0x00, parseInt(id), ...flatten(values[index]), brightness, brightness])

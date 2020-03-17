@@ -3,7 +3,6 @@ const dtls = require('node-dtls-client').dtls
 const axios = require('axios')
 const { baseHueUrl, flat, getEntertainmentGroups } = require('../utils/helpers')
 const { eventHub } = require('../utils/eventHub')
-const state = require('../utils/globalState')
 
 const hueUserName = process.env.HUE_CLIENT_KEY
 const hueClientKey = Buffer.from(process.env.HUE_CLIENT_SECRET, 'hex')
@@ -47,11 +46,10 @@ const unsafeStartStream = ({ id }) => {
         timeout: 1000
       }
 
-      options.psk[hueUserName] = hueClientKey
       const socket = dtls.createSocket(options)
+
       socket
         .on('connected', e => {
-          state.currentSync = id
           console.log('connected')
           eventHub.on('emitLight', colorMessage => {
             console.log(colorMessage)

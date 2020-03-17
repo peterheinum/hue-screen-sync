@@ -1,6 +1,6 @@
 require('dotenv').config({ path: __dirname + '../../.env' })
-const hueUserName = process.env.HUE_CLIENT_KEY
-const baseGroupUrl = `${baseHueUrl(hueUserName)}/groups`
+const axios = require('axios')
+const { get } = require('lodash')
 
 const sleep = async time => new Promise(resolve => setTimeout(() => resolve(), time))
 const flat = arr => arr.reduce((acc, cur) => [...acc, ...cur],[])
@@ -11,6 +11,9 @@ const api_key = () => process.env.API_KEY
 const emptyArray = (array) => array.splice(0, array.length)
 const baseHueUrl = key => `http://${hue_hub()}/api/${key || api_key()}`
 const objToArrayWithKeyAsId = obj => Object.keys(obj).map(key => ({ ...obj[key], id: key }))
+
+const hueUserName = process.env.HUE_CLIENT_KEY
+const baseGroupUrl = `${baseHueUrl(hueUserName)}/groups`
 
 const requireUncached = _module => {
   delete require.cache[require.resolve(_module)]
