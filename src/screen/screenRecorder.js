@@ -1,6 +1,7 @@
 const screenshot = require('screenshot-desktop')
 const ColorThief = require('colorthief')
 const sharp = require('sharp')
+const fs = require('fs')
 const { eventHub } = require('../utils/eventHub')
 
 const screenshotPath = 'screen.jpg'
@@ -20,25 +21,25 @@ const setupState = () => {
 }
 
 const extractCorners = async () => {
-  const top = 0
+  const buffer = fs.readFileSync(screenshotPath)
   const leftPath = 'left.jpg'
   const rightPath = 'right.jpg'
   const topPath = 'top.jpg'
   const bottomPath = 'bottom.jpg'
 
-  await sharp(screenshotPath)
-    .extract({ left: 0, top, ...screen, width: 50 })
+  await sharp(buffer)
+    .extract({ left: 0, top: 0, ...screen, width: 50 })
     .toFile(leftPath)
 
-  await sharp(screenshotPath)
-    .extract({ left: screen.width - 50, top, ...screen, width: 50 })
+  await sharp(buffer)
+    .extract({ left: screen.width - 50, top: 0, ...screen, width: 50 })
     .toFile(rightPath)
 
-  await sharp(screenshotPath)
-    .extract({ left: 0, top, ...screen, height: 50 })
+  await sharp(buffer)
+    .extract({ left: 0, top: 0, ...screen, height: 50 })
     .toFile(topPath)
 
-  await sharp(screenshotPath)
+  await sharp(buffer)
     .extract({ left: 0, top: screen.height - 50, ...screen, height: 50 })
     .toFile(bottomPath)
 
@@ -51,7 +52,6 @@ const getAvarageColor = async imgPath => new Promise((resolve, reject) => ColorT
   .catch(err => reject(err)))
 
 const extractColors = async () => {
-  await setupState()
   await screenshot({ filename: screenshotPath })
   const [leftPath, rightPath, topPath, bottomPath] = await extractCorners()
   const left = await getAvarageColor(leftPath)
@@ -62,8 +62,9 @@ const extractColors = async () => {
   polling && extractColors()
 }
 
-const startPoll = () => {
+const startPoll = async () => {
   polling = true
+  await setupState()
   extractColors()
 }
 const stopPoll = () => polling = !polling

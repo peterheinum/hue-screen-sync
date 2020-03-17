@@ -1,4 +1,7 @@
 require('dotenv').config({ path: __dirname + '../../.env' })
+const hueUserName = process.env.HUE_CLIENT_KEY
+const baseGroupUrl = `${baseHueUrl(hueUserName)}/groups`
+
 const sleep = async time => new Promise(resolve => setTimeout(() => resolve(), time))
 const flat = arr => arr.reduce((acc, cur) => [...acc, ...cur],[])
 const rand = max => Math.floor(Math.random() * max)
@@ -19,6 +22,23 @@ const shadeRGBColor = (color, percent) => {
   return 'rgb(' + (Math.round((t - R) * p) + R) + ',' + (Math.round((t - G) * p) + G) + ',' + (Math.round((t - B) * p) + B) + ')'
 }
 
+const getEntertainmentGroups = () => {
+  const condition = ({ type }) => type == 'Entertainment'
+  const onlyEntertainment = arr => arr.filter(condition)
+  const getData = obj => get(obj, 'data')
+
+  return new Promise((resolve, reject) => {
+    axios
+      .get(baseGroupUrl)
+      .then(getData)
+      .then(objToArrayWithKeyAsId)
+      .then(onlyEntertainment)
+      .then(resolve)
+      .catch(reject)
+  })
+}
+
+
 module.exports = {
   flat,
   rand,
@@ -29,4 +49,5 @@ module.exports = {
   shadeRGBColor,
   requireUncached,
   objToArrayWithKeyAsId,
+  getEntertainmentGroups,
 }
